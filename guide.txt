@@ -1,0 +1,31 @@
+Act as an expert Machine Learning Engineer and Academic Project Planner. I am completing a final project for my course, "EE 562 Artificial Intelligence for Engineers," and need a structured 4-week project plan, environment setup guide, and initial code architecture.
+
+Project Choice: Yelp Review Upvotes Prediction (Kaggle Dataset)
+Goal: Predict what features make a business review receive more upvotes and identify the most important features using a predictive model. The data includes features for businesses, users, check-ins, and reviews.
+
+Hard Constraints & Course Requirements:
+
+Classifiers: I must implement, train, and compare at least TWO different algorithms/classifiers.
+
+Code Originality: I can use standard packages (e.g., scikit-learn, PyTorch, XGBoost) and basic untrained classifier code, but I MUST clearly highlight/attribute all packages and code links. I cannot use pre-trained models unless I am strictly performing transfer learning myself.
+
+
+Deliverables: A well-commented codebase, multiple experiments, and a final 5+ page report (due March 16).
+
+Please provide:
+
+1. Project Architecture & Tooling: > Recommend the best framework stack for this specific Kaggle dataset (e.g., Pandas/Polars for processing, which two specific ML/DL models to compare, and how to utilize my cloud compute resources effectively).
+
+2. 4-Week Milestone Plan: > Break down the project into a realistic 4-week timeline, covering:
+
+Week 1: Data Exploration, Preprocessing, and Setup.
+
+Week 2: Baseline Model (Classifier 1) Implementation & Training.
+
+Week 3: Advanced Model (Classifier 2) Implementation & Training.
+
+Week 4: Evaluation, Feature Importance Analysis, and Report Writing.
+
+3. Data Preprocessing Strategy: > Outline the specific steps needed to handle the Yelp dataset, particularly how to merge business/user/review data and how to handle the NLP aspect of the reviews alongside tabular features.
+
+4. Initial Codebase Structure: > Provide a standard Python directory structure (e.g., data/, src/, notebooks/) and the command-line instructions (e.g., requirements.txt or environment.yml) to set up my local and cloud environments.
