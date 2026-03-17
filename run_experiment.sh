@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # run_experiment.sh — End-to-end pipeline for Yelp upvote prediction
 # Usage:
-#   ./run_experiment.sh            # run on 500k sample (default)
-#   ./run_experiment.sh --full     # run on full ~7M dataset
+#   ./run_experiment.sh                          # run on 500k sample (default)
+#   ./run_experiment.sh --full                   # run on full ~7M dataset
+#   ./run_experiment.sh --data_dir /path/to/data # custom data directory
 #   ./run_experiment.sh --epochs 30 --batch_size 4096
 
 set -euo pipefail
@@ -12,6 +13,7 @@ cd "$PROJECT_ROOT"
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
 FULL_FLAG=""
+DATA_DIR=""
 EPOCHS=20
 BATCH_SIZE=2048
 LR=1e-3
@@ -22,6 +24,7 @@ DROPOUT=0.3
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --full)          FULL_FLAG="--full"; shift ;;
+    --data_dir)      DATA_DIR="$2"; shift 2 ;;
     --epochs)        EPOCHS="$2"; shift 2 ;;
     --batch_size)    BATCH_SIZE="$2"; shift 2 ;;
     --lr)            LR="$2"; shift 2 ;;
@@ -31,6 +34,17 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
+
+# If --data_dir provided, symlink it into the project as data/
+if [[ -n "$DATA_DIR" ]]; then
+  if [[ ! -d "$DATA_DIR" ]]; then
+    echo "ERROR: data_dir '$DATA_DIR' does not exist." >&2; exit 1
+  fi
+  DATA_DIR="$(cd "$DATA_DIR" && pwd)"
+  rm -f "$PROJECT_ROOT/data"
+  ln -s "$DATA_DIR" "$PROJECT_ROOT/data"
+  echo "Using data directory: $DATA_DIR"
+fi
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 BOLD='\033[1m'; GREEN='\033[0;32m'; RED='\033[0;31m'; RESET='\033[0m'
