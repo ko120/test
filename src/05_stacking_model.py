@@ -1,3 +1,4 @@
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -75,6 +76,13 @@ def compute_metrics(y_true, y_pred, y_prob, split_name: str) -> dict:
 # main loop
 
 def main():
+    global FEATURES_DIR
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--features_dir", type=str, default=None)
+    args = parser.parse_args()
+    if args.features_dir:
+        FEATURES_DIR = Path(args.features_dir)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load base models

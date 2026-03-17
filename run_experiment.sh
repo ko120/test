@@ -80,27 +80,29 @@ START=$(date +%s)
 # step "Step 2/5 — Engineering features${FULL_FLAG:+ (full dataset)}"
 # python src/02_features.py $FULL_FLAG || fail "Feature engineering failed"
 
+FEAT_FLAG="${FEATURES_DIR_OVERRIDE:+--features_dir \"$FEATURES_DIR_OVERRIDE\"}"
+
 # ── Step 3: XGBoost ───────────────────────────────────────────────────────────
-step "Step 3/5 — Training XGBoost"
-python src/03_xgboost_model.py || fail "XGBoost training failed"
+step "Step 3/6 — Training XGBoost"
+eval python src/03_xgboost_model.py $FEAT_FLAG || fail "XGBoost training failed"
 
 # ── Step 4: MLP ───────────────────────────────────────────────────────────────
 step "Step 4/6 — Training MLP (epochs=$EPOCHS, batch=$BATCH_SIZE)"
-python src/04_mlp_model.py \
+eval python src/04_mlp_model.py \
   --epochs "$EPOCHS" \
   --batch_size "$BATCH_SIZE" \
   --lr "$LR" \
   --weight_decay "$WEIGHT_DECAY" \
   --patience "$PATIENCE" \
-  --dropout "$DROPOUT" || fail "MLP training failed"
+  --dropout "$DROPOUT" $FEAT_FLAG || fail "MLP training failed"
 
 # ── Step 5: Stacking Ensemble ─────────────────────────────────────────────────
 step "Step 5/6 — Training Stacking Ensemble"
-python src/05_stacking_model.py || fail "Stacking training failed"
+eval python src/05_stacking_model.py $FEAT_FLAG || fail "Stacking training failed"
 
 # ── Step 6: Evaluate ──────────────────────────────────────────────────────────
 step "Step 6/6 — Evaluating and generating plots"
-python src/05_evaluate.py || fail "Evaluation failed"
+eval python src/05_evaluate.py $FEAT_FLAG || fail "Evaluation failed"
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 END=$(date +%s)

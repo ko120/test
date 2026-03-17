@@ -1,9 +1,11 @@
 
+import argparse
 import json
 from pathlib import Path
 
 import joblib
 import numpy as np
+from scipy import sparse
 from sklearn.metrics import (
     accuracy_score, f1_score, precision_score,
     recall_score, roc_auc_score, classification_report,
@@ -19,7 +21,6 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_split(split: str):
-    from scipy import sparse
     X_tab = np.load(FEATURES_DIR / f"X_tabular_{split}.npy")
     X_tfidf = sparse.load_npz(FEATURES_DIR / f"X_tfidf_{split}.npz")
     X = sparse.hstack([X_tab, X_tfidf], format="csr")
@@ -46,6 +47,13 @@ def evaluate(y_true, y_pred, y_prob, split_name="test"):
 
 
 def main():
+    global FEATURES_DIR
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--features_dir", type=str, default=None)
+    args = parser.parse_args()
+    if args.features_dir:
+        FEATURES_DIR = Path(args.features_dir)
+
     # load dataset
     X_train, y_train = load_split("train")
     X_val, y_val = load_split("val")

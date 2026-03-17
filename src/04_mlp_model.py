@@ -98,7 +98,12 @@ def main():
     parser.add_argument("--weight_decay", type=float, default=1e-4)
     parser.add_argument("--patience", type=int, default=5)
     parser.add_argument("--dropout", type=float, default=0.3)
+    parser.add_argument("--features_dir", type=str, default=None)
     args = parser.parse_args()
+
+    global FEATURES_DIR
+    if args.features_dir:
+        FEATURES_DIR = Path(args.features_dir)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

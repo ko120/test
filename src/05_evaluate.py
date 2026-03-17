@@ -16,6 +16,7 @@ Outputs (saved to results/):
     fig7_feature_consensus.png         — rank-correlation scatter + consensus ranking
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -456,6 +457,13 @@ def fig7_feature_consensus(feature_names: list[str], top_n: int = 15):
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
+    global FEATURES_DIR
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--features_dir", type=str, default=None)
+    args = parser.parse_args()
+    if args.features_dir:
+        FEATURES_DIR = Path(args.features_dir)
+
     all_preds   = {m: load_predictions(m) for m in MODELS}
     all_metrics = {m: load_metrics(m)     for m in MODELS}
 
