@@ -35,13 +35,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# If --data_dir provided, symlink it into the project as data/
+# If --data_dir provided, point data/ at it via a symlink
 if [[ -n "$DATA_DIR" ]]; then
-  if [[ ! -d "$DATA_DIR" ]]; then
-    echo "ERROR: data_dir '$DATA_DIR' does not exist." >&2; exit 1
-  fi
+  [[ ! -d "$DATA_DIR" ]] && { echo "ERROR: '$DATA_DIR' does not exist." >&2; exit 1; }
   DATA_DIR="$(cd "$DATA_DIR" && pwd)"
-  rm -f "$PROJECT_ROOT/data"
+  if [[ -L "$PROJECT_ROOT/data" ]]; then
+    rm "$PROJECT_ROOT/data"                  # remove stale symlink
+  elif [[ -d "$PROJECT_ROOT/data" ]]; then
+    fail "data/ is a real directory — rename it before using --data_dir"
+  fi
   ln -s "$DATA_DIR" "$PROJECT_ROOT/data"
   echo "Using data directory: $DATA_DIR"
 fi
@@ -61,9 +63,9 @@ START=$(date +%s)
 # step "Step 1/5 — Merging tables into parquet"
 # python src/01_merge.py || fail "Merge failed"
 
-# # ── Step 2: Feature engineering ───────────────────────────────────────────────
-step "Step 2/5 — Engineering features${FULL_FLAG:+ (full dataset)}"
-python src/02_features.py $FULL_FLAG || fail "Feature engineering failed"
+# # # ── Step 2: Feature engineering ───────────────────────────────────────────────
+# step "Step 2/5 — Engineering features${FULL_FLAG:+ (full dataset)}"
+# python src/02_features.py $FULL_FLAG || fail "Feature engineering failed"
 
 # ── Step 3: XGBoost ───────────────────────────────────────────────────────────
 step "Step 3/5 — Training XGBoost"
