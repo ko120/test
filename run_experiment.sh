@@ -14,6 +14,7 @@ cd "$PROJECT_ROOT"
 # ── Parse flags ──────────────────────────────────────────────────────────────
 FULL_FLAG=""
 DATA_DIR=""
+FEATURES_DIR_OVERRIDE=""
 EPOCHS=20
 BATCH_SIZE=2048
 LR=1e-3
@@ -25,6 +26,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --full)          FULL_FLAG="--full"; shift ;;
     --data_dir)      DATA_DIR="$2"; shift 2 ;;
+    --features_dir)  FEATURES_DIR_OVERRIDE="$2"; shift 2 ;;
     --epochs)        EPOCHS="$2"; shift 2 ;;
     --batch_size)    BATCH_SIZE="$2"; shift 2 ;;
     --lr)            LR="$2"; shift 2 ;;
@@ -35,17 +37,28 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# If --data_dir provided, point data/ at it via a symlink
+# --data_dir: symlink the entire data/ folder
 if [[ -n "$DATA_DIR" ]]; then
   [[ ! -d "$DATA_DIR" ]] && { echo "ERROR: '$DATA_DIR' does not exist." >&2; exit 1; }
   DATA_DIR="$(cd "$DATA_DIR" && pwd)"
   if [[ -L "$PROJECT_ROOT/data" ]]; then
-    rm "$PROJECT_ROOT/data"                  # remove stale symlink
+    rm "$PROJECT_ROOT/data"
   elif [[ -d "$PROJECT_ROOT/data" ]]; then
     fail "data/ is a real directory — rename it before using --data_dir"
   fi
   ln -s "$DATA_DIR" "$PROJECT_ROOT/data"
   echo "Using data directory: $DATA_DIR"
+fi
+
+# --features_dir: symlink only data/features/ to an existing features folder
+if [[ -n "$FEATURES_DIR_OVERRIDE" ]]; then
+  [[ ! -d "$FEATURES_DIR_OVERRIDE" ]] && { echo "ERROR: '$FEATURES_DIR_OVERRIDE' does not exist." >&2; exit 1; }
+  FEATURES_DIR_OVERRIDE="$(cd "$FEATURES_DIR_OVERRIDE" && pwd)"
+  mkdir -p "$PROJECT_ROOT/data"
+  FEAT_LINK="$PROJECT_ROOT/data/features"
+  [[ -L "$FEAT_LINK" ]] && rm "$FEAT_LINK"
+  ln -s "$FEATURES_DIR_OVERRIDE" "$FEAT_LINK"
+  echo "Using features directory: $FEATURES_DIR_OVERRIDE"
 fi
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
